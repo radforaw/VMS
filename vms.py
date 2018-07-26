@@ -1,21 +1,25 @@
 import requests
 try:
-  from lxml import etree as ET
+	from lxml import etree as ET
 except ImportError:
-  import xml.etree.cElementTree as ETtt
+	import xml.etree.cElementTree as ET
 import datetime
 import time
 
 def get_vms():
-url='http://bcc.opendata.onl/UTMC VMS.xml'
-n=requests.get(url,params={'ApiKey':'7N0BRC3CT4KIB4BY5342743137151'})
-root=ET.fromstring(n.content)
-print n.content
-ret=[]
-for state in root.findall("VMS_State"):
-  for VMS in state.findall("VMS"):
-    tmp=datetime.datetime.strptime(VMS.find("Date").text,'%Y-%m-%d %H:%M:%S)
-    now=datetime.datetime.now()-datetime.timedelta(days=28)
-    if tmp>now and len(VMS.find('SCN').text)<20:
-      ret.append(VMS.find('Description').text,VMS.find('MessageID').text,(float(VMS.find('Northing').text),(float(VMS.find('Easting'))))
-return ret
+	url='http://bcc.opendata.onl/UTMC VMS.xml'
+	n=requests.get(url,params={'ApiKey':'7N0BRC3CT4KIB4BY5342743137151'})
+	root=ET.fromstring(n.content)
+	ret=[]
+	#print root('VMS_State')
+	for VMS in root.iterfind('VMS'):
+		tmp=datetime.datetime.strptime(VMS.find("Date").text,'%Y-%m-%d %H:%M:%S')
+		now=datetime.datetime.now()-datetime.timedelta(days=28)
+		if tmp>now and len(VMS.find('SCN').text)<20 and VMS.find('Message').text:
+			ret.append([VMS.find('Description').text,VMS.find('Message').text,(float(VMS.find('Northing').text),(float(VMS.find('Easting').text)))])
+	return ret
+
+for b in get_vms():
+	print b[0]
+	print b[1].replace('|','\n')
+	print
