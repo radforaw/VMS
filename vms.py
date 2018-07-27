@@ -5,10 +5,12 @@ except ImportError:
 	import xml.etree.cElementTree as ET
 import datetime
 import time
+import os
+import config
 
 def get_vms():
 	url='http://bcc.opendata.onl/UTMC VMS.xml'
-	n=requests.get(url,params={'ApiKey':'7N0BRC3CT4KIB4BY5342743137151'})
+	n=requests.get(url,params={'ApiKey':os.environ['ALKEY']})
 	root=ET.fromstring(n.content)
 	ret=[]
 	#print root('VMS_State')
@@ -21,5 +23,6 @@ def get_vms():
 
 for b in get_vms():
 	print b[0]
+	print b[2]
 	print b[1].replace('|','\n')
 	print
